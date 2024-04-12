@@ -1,0 +1,4 @@
+*.pickle
+*.profile
+venv/
+__pycache__/
