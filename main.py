@@ -127,7 +127,7 @@ class Game():
                 # Calculate State and reward
                 reward = 0
                 if player == _player and _paddle_collide:
-                    reward += 1
+                    reward += 10
                     print('Reward: Player', player.id, '+', reward)
                 
                 if player.id == 0:
@@ -135,14 +135,14 @@ class Game():
                         reward += 10
                         print('Reward: Player', player.id, '+', reward)
                     if self.ball.x_pos == 0:
-                        reward += -10
+                        reward += -15
                         print('Reward: Player', player.id, '+', reward)
                 if player.id == 1:
                     if self.ball.x_pos == 0:
                         reward += 10
                         print('Reward: Player', player.id, '+', reward)
                     if self.ball.x_pos == screen_width - self.ball.width:
-                        reward += -10
+                        reward += -15
                         print('Reward: Player', player.id, '+', reward)
                 
                 
