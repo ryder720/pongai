@@ -122,7 +122,7 @@ class Game():
                 paddle_row = (self.grid_rows * player.paddle.y_pos) / self.screen_dimentions[1]
                 state = (int(paddle_row), int(ball_row), int(ball_col), int(self.ball.direction[0]), int(self.ball.direction[1]))
                 action = player.agent.choose_action(state, player.agent.q_table)
-                self._move_paddle(player, action, dt)
+                self.move_paddle(player, action, dt)
                 _player, _paddle_collide = self._check_paddle_collision()
                 # Calculate State and reward
                 reward = 0
@@ -151,14 +151,14 @@ class Game():
         _pressed = pygame.key.get_pressed()
         if not self.players[0].ai:
             if _pressed[pygame.K_w]:
-                self._move_paddle(self.players[0], 1)
+                self.move_paddle(self.players[0], 1)
             if _pressed[pygame.K_s]:
-                self._move_paddle(self.players[0], -1)
+                self.move_paddle(self.players[0], -1)
         if not self.players[1].ai:
             if _pressed[pygame.K_UP]:
-                self._move_paddle(self.players[1], 1)
+                self.move_paddle(self.players[1], 1)
             if _pressed[pygame.K_DOWN]:
-                self._move_paddle(self.players[1], -1)
+                self.move_paddle(self.players[1], -1)
         # Set collision for players
         self.players[0].set_rect()
         self.players[1].set_rect()
@@ -193,17 +193,13 @@ class Game():
         # Set new collision box
         self.ball.set_rect()
     
-    def _move_paddle(self, player:Player, action: int, dt):
-        if action == 1:
-            if not player.paddle.y_pos < 0:
-                player.paddle.y_pos -= player.paddle.speed * dt
-        elif action == -1:
-            if not player.paddle.y_pos > screen_height - player.paddle.height:
-                player.paddle.y_pos += player.paddle.speed * dt
-        if player.paddle.y_pos < 0:
-            player.paddle.y_pos = 0
-        if player.paddle.y_pos > screen_height - player.paddle.height:
-            player.paddle.y_pos = screen_height - player.paddle.height
+    def move_paddle(self, player: Player, action: int, dt: float) -> None:
+        y_pos = player.paddle.y_pos
+        if action == 1 and y_pos > 0:
+            y_pos -= player.paddle.speed * dt
+        elif action == -1 and y_pos < screen_height - player.paddle.height:
+            y_pos += player.paddle.speed * dt
+        player.paddle.y_pos = max(0, min(y_pos, screen_height - player.paddle.height))
     
     def _check_paddle_collision(self):
         for player in self.players:
