@@ -127,6 +127,7 @@ class Game():
                 # Calculate State and reward
                 reward = 0
                 if player == _player and _paddle_collide:
+                    # They love abusing this
                     reward += 10
                     print('Reward: Player', player.id, '+', reward)
                 
@@ -137,7 +138,7 @@ class Game():
                     if self.ball.x_pos == 0:
                         reward += -15
                         print('Reward: Player', player.id, '+', reward)
-                if player.id == 1:
+                elif player.id == 1:
                     if self.ball.x_pos == 0:
                         reward += 10
                         print('Reward: Player', player.id, '+', reward)
@@ -199,6 +200,10 @@ class Game():
         elif action == -1:
             if not player.paddle.y_pos > screen_height - player.paddle.height:
                 player.paddle.y_pos += player.paddle.speed * dt
+        if player.paddle.y_pos < 0:
+            player.paddle.y_pos = 0
+        if player.paddle.y_pos > screen_height - player.paddle.height:
+            player.paddle.y_pos = screen_height - player.paddle.height
     
     def _check_paddle_collision(self):
         for player in self.players:
@@ -229,9 +234,10 @@ class Game():
             self.players[0].paddle.reset_paddle_position(self.screen_dimentions)
             self.players[1].paddle.reset_paddle_position(self.screen_dimentions)
 
-        if self.ball.y_pos + self.ball.direction[1] > screen_height or self.ball.y_pos + self.ball.direction[1] <= 0:
-            # Bounce ball
-            self.ball.flip_ball_y()
+        if self.ball.y_pos + self.ball.direction[1] > screen_height:
+            self.ball.direction = (self.ball.direction[0], -abs(self.ball.direction[1]))
+        if self.ball.y_pos + self.ball.direction[1] <= 0:
+            self.ball.direction = (self.ball.direction[0], abs(self.ball.direction[1]))
         
         if _paddle_collide:
             # Might move this to own method and just return true so I can add reward for hitting
@@ -267,7 +273,7 @@ if __name__ == '__main__':
     player_one = Player(0, Paddle(3,50,5), True)
     player_two = Player(1, Paddle(3,50,5), True)
 
-    game = Game(player_one, player_two, Ball(.25,6,6), (screen_width,screen_height))
+    game = Game(player_one, player_two, Ball(1,6,6), (screen_width,screen_height))
 
     while running:
         # Frame cap
