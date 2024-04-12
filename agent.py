@@ -15,7 +15,7 @@ class Agent():
         self.action_size = action_size
         self.gamma = 0.75
         self.learning_rate = 0.3
-        self.epsilon = 0.03
+        self.epsilon = 0.08
     
     def initialize_q_table(self):
         
@@ -30,18 +30,22 @@ class Agent():
         q_update = self.q_table[state, action] + self.learning_rate * delta
         return q_update
     
-    def choose_action(self, state, qtable):
-        explorer_exploit_tradeoff = rng.uniform(0,1)
+    def choose_action(self, state, q_table):
+        """
+        Choose an action based on the epsilon-greedy algorithm.
 
-        # Explore
-        if explorer_exploit_tradeoff < self.epsilon:
+        Args:
+            state (ndarray): The current state of the game.
+            q_table (ndarray): The Q-table containing the action-value estimates.
+
+        Returns:
+            int: The chosen action.
+        """
+        exploration_rate = rng.uniform(0, 1)
+
+        if exploration_rate < self.epsilon:
             action = rng.choice(ACTIONS)
-
-        # Exploit
         else:
-            # Break ties randomly
-            if np.all(qtable[state][:]) == qtable[state][0]:
-                action = rng.choice(ACTIONS)
-            else:
-                action = np.argmax(qtable[state, :])
+            action = np.argmax(q_table[state])
+
         return action
