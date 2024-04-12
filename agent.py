@@ -30,8 +30,6 @@ class Agent():
         q_update = self.q_table[state, action] + self.learning_rate * delta
         return q_update
     
-
-    
     def choose_action(self, state, qtable):
         explorer_exploit_tradeoff = rng.uniform(0,1)
 

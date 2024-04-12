@@ -26,7 +26,6 @@ class Player():
     def init_agent(self, screen_width, screen_height, rows, columns):
         _max_actions = 3
         
-        
         self.agent = agent.Agent(rows, rows, columns, _max_actions)
         if os.path.exists("qtable.pickle"):
             with open("qtable.pickle", "rb") as f:
@@ -112,7 +111,7 @@ class Game():
         with open("qtable.pickle", "wb") as f:
             pickle.dump(qtable, f)
 
-    def calc_frame(self):
+    def calc_frame(self, dt):
 
         # One call to calculate movement, score, draw sprites, etc
         ball_row = (self.grid_rows * self.ball.y_pos) / self.screen_dimentions[1]
@@ -123,14 +122,13 @@ class Game():
                 paddle_row = (self.grid_rows * player.paddle.y_pos) / self.screen_dimentions[1]
                 state = (int(paddle_row), int(ball_row), int(ball_col), int(self.ball.direction[0]), int(self.ball.direction[1]))
                 action = player.agent.choose_action(state, player.agent.q_table)
-                self._move_paddle(player, action)
+                self._move_paddle(player, action, dt)
                 _player, _paddle_collide = self._check_paddle_collision()
                 # Calculate State and reward
                 reward = 0
                 if player == _player and _paddle_collide:
                     reward += 1
                     print('Reward: Player', player.id, '+', reward)
-                
                 
                 if player.id == 0:
                     if self.ball.x_pos == screen_width - self.ball.width:
@@ -165,7 +163,7 @@ class Game():
         self.players[1].set_rect()
 
         
-        self._move_ball()
+        self._move_ball(dt)
         ball_row = (self.grid_rows * self.ball.y_pos) / self.screen_dimentions[1]
         
         ball_col = (self.grid_columns * self.ball.x_pos) / self.screen_dimentions[0]
@@ -183,24 +181,24 @@ class Game():
         # Draw ball
         pygame.draw.rect(screen, (255,255,255), self.ball.rect)
 
-    def _move_ball(self):
+    def _move_ball(self, dt):
         
         self._check_ball_collison()
 
         # Move ball
-        self.ball.x_pos += self.ball.direction[0]
-        self.ball.y_pos += self.ball.direction[1]
+        self.ball.x_pos += self.ball.direction[0] * dt
+        self.ball.y_pos += self.ball.direction[1] * dt
 
         # Set new collision box
         self.ball.set_rect()
     
-    def _move_paddle(self, player:Player, action: int):
+    def _move_paddle(self, player:Player, action: int, dt):
         if action == 1:
             if not player.paddle.y_pos < 0:
-                player.paddle.y_pos -= player.paddle.speed
+                player.paddle.y_pos -= player.paddle.speed * dt
         elif action == -1:
             if not player.paddle.y_pos > screen_height - player.paddle.height:
-                player.paddle.y_pos += player.paddle.speed
+                player.paddle.y_pos += player.paddle.speed * dt
     
     def _check_paddle_collision(self):
         for player in self.players:
@@ -262,7 +260,6 @@ if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode((screen_width,screen_height))
     clock = pygame.time.Clock()
-    clock.tick(0)
     running = True
     playing_game = False
 
@@ -273,6 +270,8 @@ if __name__ == '__main__':
     game = Game(player_one, player_two, Ball(.25,6,6), (screen_width,screen_height))
 
     while running:
+        # Frame cap
+        dt = clock.tick(0)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game.save_winner()
@@ -280,7 +279,7 @@ if __name__ == '__main__':
         
         # Clear screen
         screen.fill("black")
-        game.calc_frame()
+        game.calc_frame(dt)
 
         # Start game
         if playing_game:
