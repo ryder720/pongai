@@ -206,12 +206,13 @@ class Game():
             if player.rect.colliderect(self.ball.rect):
                 return player,True
         return None, False
+    
     def _check_ball_collison(self):
         _player, _paddle_collide = self._check_paddle_collision()
         if self.ball.x_pos + self.ball.direction[0] > screen_width - self.ball.width:
             # Score for p1
             self.score[0] += 1
-            self._print_score()
+            self.print_scores()
 
             # Flip ball or reset it
             #self.ball.flip_ball_x()
@@ -222,7 +223,7 @@ class Game():
         if self.ball.x_pos + self.ball.direction[0] < 0:
             # Score for p2
             self.score[1] += 1
-            self._print_score()
+            self.print_scores()
 
             # Flip ball or reset it
             #self.ball.flip_ball_x()
@@ -250,8 +251,11 @@ class Game():
                 self.ball.direction = (self.ball.direction[0], _new_dir)
             
 
-    def _print_score(self):
-        print('Player One: ' + repr(self.score[0]) + ' | Player Two: ' + repr(self.score[1]))
+    def print_scores(self):
+        player_one_score = self.score[0]
+        player_two_score = self.score[1]
+        score_message = f"Player One: {player_one_score} | Player Two: {player_two_score}"
+        print(score_message)
 
         
 
