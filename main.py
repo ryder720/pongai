@@ -139,6 +139,7 @@ class Game():
 
                 # Calculate State and reward
                 reward = 0
+                reward += max(0, min(percentage, .001))
                 if player == _player and _paddle_collide:
                     # They love abusing this
                     reward += 2
@@ -149,7 +150,7 @@ class Game():
                         reward += 10
                         print('Reward: Player', player.id, '+', reward)
                     if self.ball.x_pos == 0:
-                        reward += -12
+                        reward += -10
                         reward += max(0, min(percentage, 1))
                         print('Reward: Player', player.id, '+', reward)
                 elif player.id == 1:
@@ -157,7 +158,7 @@ class Game():
                         reward += 10
                         print('Reward: Player', player.id, '+', reward)
                     if self.ball.x_pos == screen_width - self.ball.width:
-                        reward += -12
+                        reward += -10
                         reward += max(0, min(percentage, 1))
                         print('Reward: Player', player.id, '+', reward)
                 

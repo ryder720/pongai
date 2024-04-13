@@ -14,7 +14,7 @@ class Agent():
         self.ball_dir_y_max = 2
         self.action_size = action_size
         self.gamma = 0.75
-        self.learning_rate = 0.3
+        self.learning_rate = 0.15
         self.epsilon = 0.1
     
     def initialize_q_table(self):
