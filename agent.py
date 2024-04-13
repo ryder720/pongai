@@ -15,7 +15,7 @@ class Agent():
         self.action_size = action_size
         self.gamma = 0.75
         self.learning_rate = 0.3
-        self.epsilon = 0.08
+        self.epsilon = 0.1
     
     def initialize_q_table(self):
         

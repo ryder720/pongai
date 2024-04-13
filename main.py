@@ -124,11 +124,24 @@ class Game():
                 action = player.agent.choose_action(state, player.agent.q_table)
                 self.move_paddle(player, action, dt)
                 _player, _paddle_collide = self._check_paddle_collision()
+
+                # Calculate the position of the ball relative to the paddle
+                if self.ball.y_pos < player.paddle.y_pos:
+                    distance = player.paddle.y_pos - self.ball.y_pos
+                elif player.paddle.y_pos <= self.ball.y_pos <= player.paddle.y_pos - player.paddle.height:
+                    distance = 0
+                else:
+                    distance = self.ball.y_pos - (player.paddle.y_pos - player.paddle.height)
+
+                # Calculate the percentage based on the distance
+                max_distance = screen_height / 2  # Assuming paddle height is the reference
+                percentage = 1 - (distance / max_distance)
+
                 # Calculate State and reward
                 reward = 0
                 if player == _player and _paddle_collide:
                     # They love abusing this
-                    reward += 10
+                    reward += 2
                     print('Reward: Player', player.id, '+', reward)
                 
                 if player.id == 0:
@@ -136,14 +149,16 @@ class Game():
                         reward += 10
                         print('Reward: Player', player.id, '+', reward)
                     if self.ball.x_pos == 0:
-                        reward += -15
+                        reward += -12
+                        reward += max(0, min(percentage, 1))
                         print('Reward: Player', player.id, '+', reward)
                 elif player.id == 1:
                     if self.ball.x_pos == 0:
                         reward += 10
                         print('Reward: Player', player.id, '+', reward)
                     if self.ball.x_pos == screen_width - self.ball.width:
-                        reward += -15
+                        reward += -12
+                        reward += max(0, min(percentage, 1))
                         print('Reward: Player', player.id, '+', reward)
                 
                 
