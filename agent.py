@@ -30,7 +30,7 @@ class Agent():
         q_update = self.q_table[state, action] + self.learning_rate * delta
         return q_update
     
-    def choose_action(self, state, q_table):
+    def choose_action(self, state, q_table) -> int:
         """
         Choose an action based on the epsilon-greedy algorithm.
 
