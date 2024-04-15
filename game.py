@@ -66,7 +66,7 @@ class Player():
 
 class Game():
     
-    def __init__(self, player_one: Player, player_two: Player, ball: Ball, screen_dimentions: tuple[int,int], screen: pygame.display) -> None:
+    def __init__(self, player_one: Player, player_two: Player, ball: Ball, screen_dimentions: tuple[int,int], screen: pygame.display, debug: bool) -> None:
         self.players = [player_one,player_two]
         self.screen_dimentions = screen_dimentions
         self.hasHuman = False
@@ -75,6 +75,7 @@ class Game():
         self.grid_rows = 15
         self.grid_columns = 15
         self.screen = screen
+        self.debug = debug
         if not player_one.ai or not player_two.ai:
             self.hasHuman = True
 
@@ -185,12 +186,23 @@ class Game():
         self._draw_sprites()
     
     def _draw_sprites(self):
+        rect_width = self.screen_dimentions[0] // self.grid_columns
+        rect_height = self.screen_dimentions[1] // self.grid_rows
+
         # Draw player one
         pygame.draw.rect(self.screen, (255,255,255), self.players[0].rect)
         # Draw player two
         pygame.draw.rect(self.screen, (255,255,255), self.players[1].rect)
         # Draw ball
         pygame.draw.rect(self.screen, (255,255,255), self.ball.rect)
+        if self.debug:
+            # Draw grid
+            for row in range(self.grid_rows):
+                for col in range(self.grid_columns):
+                    rect_x = col * rect_width
+                    rect_y = row * rect_height
+                    pygame.draw.rect(self.screen, (200,200,200), (rect_x, rect_y, 1, 1))
+    
 
     def _move_ball(self, dt):
         
@@ -266,4 +278,3 @@ class Game():
         player_two_score = self.score[1]
         score_message = f"Player One: {player_one_score} | Player Two: {player_two_score}"
         print(score_message)
-

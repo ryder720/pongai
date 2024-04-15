@@ -14,7 +14,7 @@ if __name__ == '__main__':
     player_one = game.Player(0, game.Paddle(5,50,5), True)
     player_two = game.Player(1, game.Paddle(5,50,5), True)
 
-    game = game.Game(player_one, player_two, game.Ball(1,6,6), (screen_width,screen_height), screen)
+    game = game.Game(player_one, player_two, game.Ball(1,6,6), (screen_width,screen_height), screen, True)
 
     while running:
         # Frame cap

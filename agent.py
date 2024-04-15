@@ -3,8 +3,6 @@ import numpy as np
 rng = np.random.default_rng(42)
 ACTIONS = [-1,0,1]
 
-
-
 class Agent():
     def __init__(self, paddle_y_max: int, ball_row_max: int, ball_column_max: int, action_size: int) -> None:
         self.paddle_y_max = paddle_y_max
@@ -15,7 +13,7 @@ class Agent():
         self.action_size = action_size
         self.gamma = 0.75
         self.learning_rate = 0.15
-        self.epsilon = 0.25
+        self.epsilon = 0.3
     
     def initialize_q_table(self):
         
