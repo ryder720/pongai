@@ -286,8 +286,8 @@ if __name__ == '__main__':
     playing_game = False
 
     # Game setup
-    player_one = Player(0, Paddle(3,50,5), True)
-    player_two = Player(1, Paddle(3,50,5), True)
+    player_one = Player(0, Paddle(5,50,5), True)
+    player_two = Player(1, Paddle(5,50,5), True)
 
     game = Game(player_one, player_two, Ball(1,6,6), (screen_width,screen_height))
 
