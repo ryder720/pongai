@@ -109,8 +109,8 @@ class Game():
         with open("qtable.pickle", "wb") as f:
             pickle.dump(qtable, f)
 
-    def calc_frame(self, dt):
-
+    def calc_frame(self, dt) -> bool:
+        playing = True
         # One call to calculate movement, score, draw sprites, etc
         ball_row = (self.grid_rows * self.ball.y_pos) / self.screen_dimentions[1]
         ball_col = (self.grid_columns * self.ball.x_pos) / self.screen_dimentions[0]
@@ -138,27 +138,20 @@ class Game():
                 # Calculate State and reward
                 reward = 0
                 reward += max(0, min(percentage, .001))
-                if player == _player and _paddle_collide:
-                    # They love abusing this
-                    reward += 2
-                    print('Reward: Player', player.id, '+', reward)
                 
                 if player.id == 0:
-                    if self.ball.x_pos == self.screen_dimentions[0] - self.ball.width:
-                        reward += 10
-                        print('Reward: Player', player.id, '+', reward)
                     if self.ball.x_pos == 0:
                         reward += -10
                         reward += max(0, min(percentage, 1))
-                        print('Reward: Player', player.id, '+', reward)
+                        playing = False
                 elif player.id == 1:
-                    if self.ball.x_pos == 0:
-                        reward += 10
-                        print('Reward: Player', player.id, '+', reward)
                     if self.ball.x_pos == self.screen_dimentions[0] - self.ball.width:
                         reward += -10
                         reward += max(0, min(percentage, 1))
-                        print('Reward: Player', player.id, '+', reward)
+                        playing = False
+                if self.debug: print('Reward: Player', player.id, '+', reward)
+        
+                
         
         _pressed = pygame.key.get_pressed()
         if not self.players[0].ai:
@@ -184,6 +177,7 @@ class Game():
                 paddle_row = (self.grid_rows * player.paddle.y_pos) / self.screen_dimentions[1]
                 player.agent.update_q_table(state, action, reward, (int(paddle_row), int(ball_row), int(ball_col), int(self.ball.direction[0]), int(self.ball.direction[1])))
         self._draw_sprites()
+        return playing
     
     def _draw_sprites(self):
         rect_width = self.screen_dimentions[0] // self.grid_columns
