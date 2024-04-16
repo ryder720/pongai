@@ -102,10 +102,7 @@ class Game():
         self._draw_sprites()
 
     def save_winner(self):
-        if self.score[0] > self.score[1]:
-            qtable = self.players[0].agent.q_table
-        else:
-            qtable = self.players[0].agent.q_table
+        qtable = self.players[0].agent.q_table
         with open("qtable.pickle", "wb") as f:
             pickle.dump(qtable, f)
         print('Saved q_table')
