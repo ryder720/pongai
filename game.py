@@ -108,6 +108,7 @@ class Game():
             qtable = self.players[0].agent.q_table
         with open("qtable.pickle", "wb") as f:
             pickle.dump(qtable, f)
+        print('Saved q_table')
 
     def calc_frame(self, dt) -> bool:
         playing = True
@@ -226,26 +227,29 @@ class Game():
     def _check_ball_collison(self):
         _player, _paddle_collide = self._check_paddle_collision()
         if self.ball.x_pos + self.ball.direction[0] > self.screen_dimentions[0] - self.ball.width:
+            # Flip ball or reset it
+            #self.ball.flip_ball_x()
+            self.ball.reset_ball(self.screen_dimentions)
+            self.players[0].paddle.reset_paddle_position(self.screen_dimentions)
+            self.players[1].paddle.reset_paddle_position(self.screen_dimentions)
             # Score for p1
             self.score[0] += 1
-            self.print_scores()
+            # Will print when working
+            #self.print_scores()
 
-            # Flip ball or reset it
-            #self.ball.flip_ball_x()
-            self.ball.reset_ball(self.screen_dimentions)
-            self.players[0].paddle.reset_paddle_position(self.screen_dimentions)
-            self.players[1].paddle.reset_paddle_position(self.screen_dimentions)
+            
 
         if self.ball.x_pos + self.ball.direction[0] < 0:
-            # Score for p2
-            self.score[1] += 1
-            self.print_scores()
-
             # Flip ball or reset it
             #self.ball.flip_ball_x()
             self.ball.reset_ball(self.screen_dimentions)
             self.players[0].paddle.reset_paddle_position(self.screen_dimentions)
             self.players[1].paddle.reset_paddle_position(self.screen_dimentions)
+            # Score for p2
+            self.score[1] += 1
+            #self.print_scores()
+
+            
 
         if self.ball.y_pos + self.ball.direction[1] > self.screen_dimentions[1]:
             self.ball.direction = (self.ball.direction[0], -abs(self.ball.direction[1]))

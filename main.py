@@ -17,7 +17,7 @@ if __name__ == '__main__':
     game = game.Game(player_one, player_two, game.Ball(1,6,6), (screen_width,screen_height), screen, False)
 
     while running:
-        for episode in range(10000):
+        for episode in range(200000):
             playing_game = True
             while playing_game:
             # Frame cap
@@ -34,4 +34,5 @@ if __name__ == '__main__':
             print('Game', episode + 1, 'finished')
             if not running:
                 break
+        running = False
         game.save_winner()
