@@ -107,7 +107,7 @@ class Game():
             pickle.dump(qtable, f)
         print('Saved q_table')
 
-    def calc_frame(self, dt) -> bool:
+    def calc_frame(self, dt):
         playing = True
         # One call to calculate movement, score, draw sprites, etc
         ball_row = (self.grid_rows * self.ball.y_pos) / self.screen_dimentions[1]
@@ -121,33 +121,38 @@ class Game():
                 self.move_paddle(player, action, dt)
                 _player, _paddle_collide = self._check_paddle_collision()
 
-                # Calculate the position of the ball relative to the paddle
-                if self.ball.y_pos < player.paddle.y_pos:
-                    distance = player.paddle.y_pos - self.ball.y_pos
-                elif player.paddle.y_pos <= self.ball.y_pos <= player.paddle.y_pos - player.paddle.height:
-                    distance = 0
-                else:
-                    distance = self.ball.y_pos - (player.paddle.y_pos - player.paddle.height)
+        # Calculate the position of the ball relative to the paddle
+        if self.ball.y_pos < player.paddle.y_pos:
+            distance = player.paddle.y_pos - self.ball.y_pos
+        elif player.paddle.y_pos <= self.ball.y_pos <= player.paddle.y_pos - player.paddle.height:
+            distance = 0
+        else:
+            distance = self.ball.y_pos - (player.paddle.y_pos - player.paddle.height)
 
-                # Calculate the percentage based on the distance
-                max_distance = self.screen_dimentions[1]/ 2  # Assuming paddle height is the reference
-                percentage = 1 - (distance / max_distance)
+        # Calculate the percentage based on the distance
+        max_distance = self.screen_dimentions[1]/ 2  # Assuming paddle height is the reference
+        percentage = 1 - (distance / max_distance)
 
-                # Calculate State and reward
-                reward = 0
-                reward += max(0, min(percentage, .001))
-                
-                if player.id == 0:
-                    if self.ball.x_pos == 0:
-                        reward += -10
-                        reward += max(0, min(percentage, 1))
-                        playing = False
-                elif player.id == 1:
-                    if self.ball.x_pos == self.screen_dimentions[0] - self.ball.width:
-                        reward += -10
-                        reward += max(0, min(percentage, 1))
-                        playing = False
-                if self.debug: print('Reward: Player', player.id, '+', reward)
+        # Calculate State and reward
+        p1reward = 0
+        p2reward = 0
+        posreward = 0
+        p1reward += max(0, min(percentage, .001))
+        posreward += max(0, min(percentage, .001))
+        if player.id == 0:
+            if self.ball.x_pos == self.screen_dimentions[0] - self.ball.width:
+                p1reward += 10
+                posreward += 10
+            if self.ball.x_pos == 0:
+                p1reward += -10
+                playing = False
+        elif player.id == 1:
+            if self.ball.x_pos == 0:
+                p2reward += 10
+            if self.ball.x_pos == self.screen_dimentions[0] - self.ball.width:
+                p2reward += -10
+                playing = False
+        if self.debug: print('Reward: Player', player.id, '+', reward)
         
                 
         
@@ -172,10 +177,14 @@ class Game():
         ball_col = (self.grid_columns * self.ball.x_pos) / self.screen_dimentions[0]
         for player in self.players:
             if player.ai:
+                if player.id == 0:
+                    reward = p1reward
+                elif player.id == 1:
+                    reward = p2reward
                 paddle_row = (self.grid_rows * player.paddle.y_pos) / self.screen_dimentions[1]
                 player.agent.update_q_table(state, action, reward, (int(paddle_row), int(ball_row), int(ball_col), int(self.ball.direction[0]), int(self.ball.direction[1])))
         self._draw_sprites()
-        return playing
+        return playing, posreward
     
     def _draw_sprites(self):
         rect_width = self.screen_dimentions[0] // self.grid_columns

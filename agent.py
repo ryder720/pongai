@@ -12,13 +12,12 @@ class Agent():
         self.ball_dir_y_max = 2
         self.action_size = action_size
         self.gamma = 0.75
-        self.learning_rate = 0.15
+        self.learning_rate = 0.5
         self.epsilon = 0.3
         self.q_table = np.zeros((self.paddle_y_max + 2, self.ball_row_max + 1, self.ball_column_max + 1, self.ball_dir_x_max + 1, self.ball_dir_y_max + 1, self.action_size))
 
     
     def initialize_q_table(self):
-        
         self.q_table = np.zeros((self.paddle_y_max + 2, self.ball_row_max + 1, self.ball_column_max + 1, self.ball_dir_x_max + 1, self.ball_dir_y_max + 1, self.action_size))
 
     def update_q_table(self, state, action, reward, newstate):
@@ -28,7 +27,6 @@ class Agent():
             - self.q_table[state , action]
         )
         self.q_table[state, action] = self.q_table[state, action] + self.learning_rate * delta
-        
     
     def choose_action(self, state, q_table) -> int:
         """
