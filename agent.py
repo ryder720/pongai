@@ -28,16 +28,6 @@ class Agent():
         self.q_table[state, action] = self.q_table[state, action] + self.learning_rate * delta
     
     def choose_action(self, state, q_table) -> int:
-        """
-        Choose an action based on the epsilon-greedy algorithm.
-
-        Args:
-            state (ndarray): The current state of the game.
-            q_table (ndarray): The Q-table containing the action-value estimates.
-
-        Returns:
-            int: The chosen action.
-        """
         exploration_rate = rng.uniform(0, 1)
 
         if exploration_rate < self.epsilon:

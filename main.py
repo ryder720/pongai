@@ -1,4 +1,4 @@
-import pygame, game    
+import pygame, game, time  
 
 if __name__ == '__main__':
     screen_width = 500
@@ -13,8 +13,6 @@ if __name__ == '__main__':
 
     timestep_per_episode = []
     reward_gained_per_episode = []
-    learning_rate = [0.1, 0.5, 0.9, 1]
-
 
     # Game setup
     player_one = game.Player(0, game.Paddle(600,50,5), True)
@@ -22,32 +20,42 @@ if __name__ == '__main__':
 
     game = game.Game(player_one, player_two, game.Ball(500,6,6), (screen_width,screen_height), screen, debug)
 
-while running:
-        for episode in range(200):
-            timestep_per_episode = []
-            reward_gained_per_episode = []
-            playing_game = True
-            timestep = 0
-            reward = 0
-            while playing_game:
-                # Frame cap
-                dt = clock.tick(120) / 1000
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        running = False
-                
-                # Clear screen
-                screen.fill("black")
-                playing_game, step_reward = game.calc_frame(dt)
-                timestep += 1
-                reward += step_reward
-                pygame.display.flip()
+    while running:
+            episodes = 200000
+            episodes_ran = 0
+            start_time = time.time()
+            for episode in range(episodes):
+                timestep_per_episode = []
+                reward_gained_per_episode = []
+                playing_game = True
+                timestep = 0
+                reward = 0
+                while playing_game:
+                    # Frame cap
+                    dt = clock.tick(120) / 1000
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            running = False
+                    
+                    # Clear screen
+                    screen.fill("black")
+                    playing_game, step_reward = game.calc_frame(dt)
+                    timestep += 1
+                    reward += step_reward
+                    pygame.display.flip()
+                    if not running:
+                        break
+                print('Game', episode + 1, 'out of', episodes ,'finished with reward: ', reward)
+                episodes_ran += 1
+                timestep_per_episode.append(timestep)
+                reward_gained_per_episode.append(reward)
                 if not running:
                     break
-            print('Game', episode + 1, 'finished with reward: ', reward)
-            timestep_per_episode.append(timestep)
-            reward_gained_per_episode.append(reward)
-            if not running:
-                break
-        running = False
-        game.save_winner()
+            end_time = time.time()
+            total_time = end_time - start_time
+            total_time_hours = 0
+            if total_time > 3600:
+                total_time_hours = total_time / 3600
+            print(episodes_ran, 'episodes finished in', int(total_time_hours), 'hours', round(total_time - int(total_time_hours) * 3600), 'seconds')
+            running = False
+            game.save_winner()
