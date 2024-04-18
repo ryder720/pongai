@@ -135,15 +135,6 @@ class Game():
         p2reward = 0
         positive_reward = 0
         p1reward += max(0, min(percentage, .001))
-        positive_reward += max(0, min(percentage, .001))
-        if self.ball.rect.x <= self.ball.width / 2:
-            p2reward += 10
-            p1reward += -10
-        if self.ball.rect.x >= self.screen_dimentions[0] - self.ball.width:
-            p2reward += -10
-            p1reward += 10
-            positive_reward += 10
-        if self.debug: print('Player 1 reward', p1reward, 'Player 2 reward', p2reward)
         
                 
         
@@ -162,7 +153,11 @@ class Game():
         self.players[0].set_rect()
         self.players[1].set_rect()
         
-        playing = self._move_ball(dt)
+        playing,p1_move_reward,p2_move_reward= self._move_ball(dt)
+        p1reward += p1_move_reward
+        p2reward += p2_move_reward
+
+        if self.debug: print('Player 1 reward', p1reward, 'Player 2 reward', p2reward)
         for player in self.players:
             if player.ai:
                 if player.id == 0:
@@ -171,7 +166,7 @@ class Game():
                     reward = p2reward
                 player.agent.update_q_table(state, action, reward, (round(player.paddle.y_pos) - player.paddle.height, self.ball.rect.x, self.ball.rect.y))
         self._draw_sprites()
-        return playing, positive_reward
+        return playing, p1reward
     
     def _draw_sprites(self):
         # Draw player one
@@ -184,7 +179,8 @@ class Game():
 
     def _move_ball(self, dt):
         ball_rect_pos = self.ball.rect
-        if not self._check_ball_collison(dt): return False
+        playing, p1_move_reward, p2_move_reward = self._check_ball_collison(dt)
+        if not playing: return False, p1_move_reward, p2_move_reward
 
         # Move ball
         ball_rect_pos.x += self.ball.speed * self.ball.direction[0] * dt
@@ -192,7 +188,7 @@ class Game():
 
         # Set new collision box
         self.ball.set_rect(ball_rect_pos)
-        return True
+        return True, p1_move_reward, p2_move_reward
     
     def move_paddle(self, player: Player, action: int, dt: float) -> None:
         y_pos = player.paddle.y_pos
@@ -209,6 +205,8 @@ class Game():
         return None, False
     
     def _check_ball_collison(self, dt):
+        p1reward = 0
+        p2reward = 0
         _player, _paddle_collide = self._check_paddle_collision()
         if self.ball.rect.x + self.ball.direction[0] * self.ball.speed * dt >= self.screen_dimentions[0] - self.ball.width / 4:
             # Flip ball or reset it
@@ -218,9 +216,11 @@ class Game():
             self.players[1].paddle.reset_paddle_position(self.screen_dimentions)
             # Score for p1
             self.score[0] += 1
+            p1reward = 10
+            p2reward = -10
             # Will print when working
             self.print_scores()
-            return False
+            return False, p1reward, p2reward
 
             
 
@@ -232,8 +232,10 @@ class Game():
             self.players[1].paddle.reset_paddle_position(self.screen_dimentions)
             # Score for p2
             self.score[1] += 1
+            p1reward = -10
+            p2reward = 10
             self.print_scores()
-            return False
+            return False, p1reward, p2reward
 
         if self.ball.rect.y + self.ball.direction[1] * self.ball.speed * dt > self.screen_dimentions[1] - self.ball.height:
             self.ball.direction = (self.ball.direction[0], -abs(self.ball.direction[1]))
@@ -253,7 +255,7 @@ class Game():
                 if _percent >= .6:
                     _new_dir = 1
                 self.ball.direction = (self.ball.direction[0], _new_dir)
-        return True
+        return True, p1reward, p2reward
             
 
     def print_scores(self):
