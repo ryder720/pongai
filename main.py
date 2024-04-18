@@ -21,7 +21,7 @@ if __name__ == '__main__':
     game = game.Game(player_one, player_two, game.Ball(500,6,6), (screen_width,screen_height), screen, debug)
 
     while running:
-            episodes = 200000
+            episodes = 200
             episodes_ran = 0
             start_time = time.time()
             for episode in range(episodes):

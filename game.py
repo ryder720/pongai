@@ -75,14 +75,15 @@ class Game():
         self.score = [0,0]
         self.screen = screen
         self.debug = debug
+        self.paddle_screen_cushion = 10
         if not player_one.ai or not player_two.ai:
             self.hasHuman = True
 
         # Set up game
-        self.players[0].paddle.x_pos = 0
+        self.players[0].paddle.x_pos = 0 + self.paddle_screen_cushion
         self.players[0].paddle.y_pos = (int) (screen_dimentions[1] / 2)
 
-        self.players[1].paddle.x_pos = screen_dimentions[0] - self.players[1].paddle.width
+        self.players[1].paddle.x_pos = screen_dimentions[0] - self.players[1].paddle.width - self.paddle_screen_cushion
         self.players[1].paddle.y_pos = (int) (screen_dimentions[1] / 2)
 
         self.ball.reset_ball(screen_dimentions)
@@ -209,7 +210,7 @@ class Game():
     
     def _check_ball_collison(self, dt):
         _player, _paddle_collide = self._check_paddle_collision()
-        if self.ball.rect.x + self.ball.direction[0] * self.ball.speed * dt >= self.screen_dimentions[0] - self.ball.width / 2:
+        if self.ball.rect.x + self.ball.direction[0] * self.ball.speed * dt >= self.screen_dimentions[0] - self.ball.width / 4:
             # Flip ball or reset it
             #self.ball.flip_ball_x()
             self.ball.reset_ball(self.screen_dimentions)
@@ -223,7 +224,7 @@ class Game():
 
             
 
-        if self.ball.rect.x + self.ball.direction[0] * self.ball.speed * dt <= -self.ball.width / 2:
+        if self.ball.rect.x + self.ball.direction[0] * self.ball.speed * dt <= -self.ball.width:
             # Flip ball or reset it
             #self.ball.flip_ball_x()
             self.ball.reset_ball(self.screen_dimentions)
